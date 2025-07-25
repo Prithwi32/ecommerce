@@ -11,6 +11,7 @@ const ModalWishlist = () => {
   const { isModalOpen, closeModalWishlist } = useModalWishlistContext();
   const { wishlistState, removeFromWishlist } = useWishlist();
 
+
   return (
     <>
       <div
@@ -56,11 +57,11 @@ const ModalWishlist = () => {
                       </div>
                       <div className="flex items-center gap-2 mt-2">
                         <div className="product-price text-title">
-                          ${productDetail?.price}.00
+                        ₹{productDetail?.price}.00
                         </div>
                         {productDetail?.originPrice && (
                           <div className="product-origin-price text-title text-purple2">
-                            <del>${productDetail?.originPrice}.00</del>
+                            <del>₹{productDetail?.originPrice}.00</del>
                           </div>
                         )}
                       </div>
@@ -76,7 +77,7 @@ const ModalWishlist = () => {
               );
             })}
           </div>
-          <div className="footer-modal p-6 border-t bg-white border-line absolute bottom-0 left-0 w-full text-center">
+          {/* <div className="footer-modal p-6 border-t bg-white border-line absolute bottom-0 left-0 w-full text-center">
             <Link
               href={"/wishlist"}
               onClick={closeModalWishlist}
@@ -90,7 +91,7 @@ const ModalWishlist = () => {
             >
               Or continue shopping
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

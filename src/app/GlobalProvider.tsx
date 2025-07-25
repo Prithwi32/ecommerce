@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import { CartProvider } from '@/context/CartContext'
 import { ModalCartProvider } from '@/context/ModalCartContext'
@@ -7,26 +8,31 @@ import { CompareProvider } from '@/context/CompareContext'
 import { ModalCompareProvider } from '@/context/ModalCompareContext'
 import { ModalSearchProvider } from '@/context/ModalSearchContext'
 import { ModalQuickviewProvider } from '@/context/ModalQuickviewContext'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <CartProvider>
-            <ModalCartProvider>
-                <WishlistProvider>
-                    <ModalWishlistProvider>
-                        <CompareProvider>
-                            <ModalCompareProvider>
-                                <ModalSearchProvider>
-                                    <ModalQuickviewProvider>
-                                        {children}
-                                    </ModalQuickviewProvider>
-                                </ModalSearchProvider>
-                            </ModalCompareProvider>
-                        </CompareProvider>
-                    </ModalWishlistProvider>
-                </WishlistProvider>
-            </ModalCartProvider>
-        </CartProvider>
+        <QueryClientProvider client={queryClient}>
+            <CartProvider>
+                <ModalCartProvider>
+                    <WishlistProvider>
+                        <ModalWishlistProvider>
+                            <CompareProvider>
+                                <ModalCompareProvider>
+                                    <ModalSearchProvider>
+                                        <ModalQuickviewProvider>
+                                            {children}
+                                        </ModalQuickviewProvider>
+                                    </ModalSearchProvider>
+                                </ModalCompareProvider>
+                            </CompareProvider>
+                        </ModalWishlistProvider>
+                    </WishlistProvider>
+                </ModalCartProvider>
+            </CartProvider>
+        </QueryClientProvider>
     )
 }
 

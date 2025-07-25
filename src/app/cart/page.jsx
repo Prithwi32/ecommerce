@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -19,9 +19,7 @@ const shippingOptions = [
 ];
 
 const CartItem = ({ product }) => {
-  const { removeProductFromCart , decreaseCartItemQuantity , increaseCartItemQuantity} = useCartStore();
-  
-  
+  const { removeProductFromCart, decreaseCartItemQuantity, increaseCartItemQuantity } = useCartStore();
   return (
     <div
       className="item flex md:mt-7 md:pb-7 mt-5 pb-5 border-b border-line w-full"
@@ -29,18 +27,25 @@ const CartItem = ({ product }) => {
     >
       <div className="w-1/2 flex items-center gap-6">
         <div className="bg-img md:w-[100px] w-20 aspect-[3/4]">
-          <Image
-            src={product.image || ""}
-            width={1000}
-            height={1000}
-            alt={product.name}
-            className="w-full h-full object-cover rounded-lg"
-          />
+          {product?.productDetails?.img ? (
+            <Image
+              src={product.productDetails.img}
+              width={1000}
+              height={1000}
+              title={product?.productDetails?.name || "Product image"}
+              alt={product?.productDetails?.name || "Product image"}
+              className="w-full h-full object-cover rounded-lg"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+              <Icon.Image className="text-gray-400 text-3xl" />
+            </div>
+          )}
         </div>
         <div className="text-title">{product?.productDetails?.[0]?.name}</div>
       </div>
       <div className="w-1/12 text-center text-title">
-        ${product.totalAmount}.00
+        ₹{product.totalAmount}.00
       </div>
       <div className="w-1/6 flex justify-center">
         <div className="quantity-block bg-surface p-3 flex items-center justify-between rounded-lg border border-line md:w-[100px] w-20">
@@ -50,7 +55,7 @@ const CartItem = ({ product }) => {
         </div>
       </div>
       <div className="w-1/6 text-center text-title">
-        ${product.totalAmount}.00
+        ₹{product.totalAmount}.00
       </div>
       <div
         onClick={() => removeProductFromCart(product?.PK, product?.SK)}
@@ -69,6 +74,15 @@ const Cart = () => {
     (total, item) => total + item.totalAmount * item.qty,
     0
   );
+
+
+
+  const checkoutHandler = useCallback(() => {
+    const cartId = `cart_${new Date().getTime()}`;
+    sessionStorage.setItem(cartId, JSON.stringify(mergedCart));
+    router.push(`/checkout/${cartId}`);
+  }, [mergedCart]);
+
   return (
     <>
       <TopNavOne
@@ -82,6 +96,7 @@ const Cart = () => {
 
       <div className="cart-block md:py-20 py-10">
         <div className="container">
+          <h1 className="text-center text-4xl font-bold mb-10">Your Shopping Cart</h1>
           <div className="content-main flex justify-between max-xl:flex-col gap-y-8">
             {/* Cart Items Section */}
             <div className="xl:w-2/3 xl:pr-3 w-full">
@@ -95,7 +110,7 @@ const Cart = () => {
                   </div>
                 </div>
                 <div className="list-product-main w-full mt-3">
-                  {mergedCart.map((product,i) => (
+                  {mergedCart.map((product, i) => (
                     <CartItem key={i} product={product} />
                   ))}
                 </div>
@@ -107,9 +122,9 @@ const Cart = () => {
                 <div className="heading5">Order Summary</div>
                 <div className="py-5 flex justify-between border-b border-line">
                   <div className="text-title">Subtotal</div>
-                  <div className="text-title">${subtotal}.00</div>
+                  <div className="text-title">₹{subtotal}.00</div>
                 </div>
-                <div className="py-5 flex justify-between border-b border-line">
+                {/* <div className="py-5 flex justify-between border-b border-line">
                   <div className="text-title">Shipping</div>
                   <div className="choose-type flex gap-12">
                     <div className="left">
@@ -131,20 +146,20 @@ const Cart = () => {
                     <div className="right">
                       {shippingOptions.map(({ id, price }) => (
                         <div key={id} className="text-on-surface-variant1 mt-1">
-                          ${price}.00
+                          ₹{price}.00
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
+                </div> */}
                 <div className="pt-4 pb-4 flex justify-between">
                   <div className="heading5">Total</div>
-                  <div className="heading5">${subtotal}.00</div>
+                  <div className="heading5">₹{subtotal}.00</div>
                 </div>
                 <div className="flex flex-col items-center gap-y-4 mt-5">
                   <button
                     className="checkout-btn button-main text-center w-full"
-                    onClick={() => router.push("/checkout")}
+                    onClick={() => checkoutHandler()}
                   >
                     Process To Checkout
                   </button>

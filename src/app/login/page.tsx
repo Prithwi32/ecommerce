@@ -39,16 +39,17 @@ const Login = () => {
     const payload = {
       phoneNo: phoneNo,
       otp: otp,
+      businessType: process.env.NEXT_PUBLIC_BUSINESS_NAME,
     };
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/user/verifyOtp`,
         payload
       );
-      toast.success("User Loged In");
       Cookies.set("accessToken", response?.data?.data?.accessToken, {
-        expires: 1,
-      }); // Expires in 7 days
+        expires: 30, // Expires in 30 days
+    });
+      toast.success("User Loged In");
     } catch (error: unknown) {
       const errorMessage =
         (error as { message?: string })?.message ||
@@ -93,6 +94,7 @@ const Login = () => {
       </div>
       <div className="login-block md:py-20 py-10">
         <div className="container">
+          <h1 className="text-center text-4xl font-bold mb-10">Login to Your Account</h1>
           <div className="content-main flex gap-y-8 max-md:flex-col">
             <div className="left md:w-1/2 w-full lg:pr-[60px] md:pr-[40px] md:border-r p-5 border-line bg-[#f6efff]">
               <div className="heading4">Login</div>
@@ -144,7 +146,7 @@ const Login = () => {
                     />
                   </div>
                 )}
-                <div className="flex items-center justify-between mt-5">
+                {/* <div className="flex items-center justify-between mt-5">
                   <div className="flex items-center">
                     <div className="block-input">
                       <input type="checkbox" name="remember" id="remember" />
@@ -164,7 +166,7 @@ const Login = () => {
                   >
                     Forgot Your Password?
                   </Link>
-                </div>
+                </div> */}
                 <div className="block-button md:mt-7 mt-4">
                   <button
                     className="button-main"
@@ -177,7 +179,7 @@ const Login = () => {
                 {success && <p className="text-green-500 mt-3">{success}</p>}
               </form>
             </div>
-            <div className="right md:w-1/2 w-full lg:pl-[60px] md:pl-[40px] flex items-center">
+            {/* <div className="right md:w-1/2 w-full lg:pl-[60px] md:pl-[40px] flex items-center">
               <div className="text-content">
                 <div className="heading4">New Customer</div>
                 <div className="mt-2 text-secondary2">
@@ -191,7 +193,7 @@ const Login = () => {
                   </Link>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

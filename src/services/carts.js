@@ -3,10 +3,10 @@ import useCartStore from "@/globalStore/useCartStore";
 import { toast } from 'react-toastify';
 import { getCartListData, getProductListData } from '@/api/productApis/getPostApi';
 
-async function cart(product, itemQty, openModalCart) {
+async function cart(product, itemQty, openModalCart , activeColor, activeWidth , activeLength) {
     try {
         openModalCart();
-        
+
         const payload = {
             businessType: process.env.NEXT_PUBLIC_BUSINESS_NAME,
             productId: {
@@ -15,6 +15,7 @@ async function cart(product, itemQty, openModalCart) {
             },
             qty: itemQty || 1,
             totalAmount: (product?.price || 0) * (itemQty || 1), // Ensure price calculation is correct
+            selectedSize:`${activeWidth},${activeLength}`
         };
 
         const response = await addCart(payload);
@@ -38,9 +39,16 @@ async function cart(product, itemQty, openModalCart) {
     }
 }
 
-export const handleAddToCart = (product, openModalCart, itemQty = 1) => {
-    cart(product, itemQty, openModalCart);
+
+export const handleAddToCart = (product, openModalCart, itemQty = 1, activeColor, activeWidth, activeLength) => {
+    // Ensure quantity is provided and is greater than 0
+    if (itemQty <= 0) {
+        toast.error('Please select a valid quantity.');
+        return;
+    }
+    cart(product, itemQty, openModalCart, activeColor , activeWidth , activeLength); // Pass activeColor too
 };
+
 
 export const fetchAndMergeCartData = async () => {
     try {
@@ -49,13 +57,13 @@ export const fetchAndMergeCartData = async () => {
 
         const mergedCart = await Promise.all(
             cartItems.map(async (item) => {
-                const productDetailsResponse = await getProductListData({
-                    PK: item?.productId?.PK,
-                    SK: item?.productId?.SK,
-                });
+                const productDetailsResponse = await getProductListData(
+                    item?.productId?.PK,
+                    item?.productId?.SK,
+                );
                 return {
                     ...item,
-                    productDetails: productDetailsResponse?.data?.items || {},
+                    productDetails: productDetailsResponse?.data?.[0] || {},
                 };
             })
         );

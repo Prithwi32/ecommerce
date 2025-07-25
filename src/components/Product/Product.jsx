@@ -15,15 +15,11 @@ import { toast } from 'react-toastify'
 
 
 const Product = ({ product }) => {
-
-    
-
     const { openModalCart } = useModalCartContext()
     const { openModalWishlist } = useModalWishlistContext()
     const { openQuickview } = useModalQuickviewContext()
     const { addToWishlist } = useWishlist()
     const router = useRouter();
-
 
     const handleQuickviewOpen = (product) => {
         openQuickview(product)
@@ -32,9 +28,8 @@ const Product = ({ product }) => {
     const handleCart = () => {
         const accessToken = Cookies.get("accessToken");
         if (!accessToken) {
-            console.log('token is not avilable');
             toast.error("Please log in to add items to the cart.");
-            router.push("/login"); 
+            router.push("/login");
             return;
         } else {
             handleAddToCart(product, openModalCart);
@@ -44,9 +39,8 @@ const Product = ({ product }) => {
     const handleWishList = (product) => {
         const accessToken = Cookies.get("accessToken");
         if (!accessToken) {
-            console.log('token is not avilable');
             toast.error("Please log in to add items to the cart.");
-            router.push("/login"); 
+            router.push("/login");
             return;
         } else {
             addToWishlist(product);
@@ -73,7 +67,6 @@ const Product = ({ product }) => {
                         Sale
                     </div>
                 )}
-
                 <div onClick={(e) => {
                     e.stopPropagation();
                     handleWishList(product);
@@ -86,14 +79,15 @@ const Product = ({ product }) => {
                 </div>
 
                 {/* Product Image */}
-                <div className="product-img w-full h-full aspect-[3/4]">
+                <div className="relative w-full pb-[133.33%] bg-gray-100">
                     <Image
                         src={product?.img || "/ribbon.png"}
-                        width={500}
-                        height={500}
-                        alt={product?.name}
-                        priority={true}
-                        className="w-full h-full object-cover duration-700"
+                        width={600}
+                        height={800}
+                        alt={product?.name || "Product image"}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        priority={true} // 👈 Important: preloads the image
+                        sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
                     />
                 </div>
 
@@ -131,7 +125,7 @@ const Product = ({ product }) => {
                 <div className="list-action-icon flex items-center justify-center gap-10 absolute w-full bottom-3 z-[1] lg:hidden">
                     <div onClick={(e) => {
                         e.stopPropagation()
-                        handleQuickviewOpen()
+                        handleQuickviewOpen(product)
                     }} className="quick-view-btn w-9 h-9 flex items-center justify-center rounded-lg duration-300 bg-white hover:bg-purple hover:text-white">
                         <Icon.Eye className="text-lg" />
                     </div>
@@ -150,7 +144,7 @@ const Product = ({ product }) => {
                     <div className="progress bg-line h-1.5 w-full rounded-[10px] overflow-hidden relative">
                         <div className="progress-sold bg-red absolute left-0 top-0 h-full" style={{ width: "50%" }}></div>
                     </div>
-                    <div className="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2">
+                    <div className="flex items-center justify-between gap-3 gap-y-1 flex-wrap mt-2 hidden ">
                         <div className="text-button-uppercase">
                             <span className="text-secondary2 max-sm:text-xs">Sold: </span>
                             <span className="max-sm:text-xs">{product?.quantity - 50}</span>
@@ -161,7 +155,7 @@ const Product = ({ product }) => {
                         </div>
                     </div>
                 </div>
-                <div className="product-name text-title duration-300">{product?.name}</div>
+                <div className="product-name text-title duration-300">{product?.title}</div>
                 <div className="list-color py-2 max-md:hidden flex items-center gap-3 flex-wrap duration-500">
                     {product?.imageURLs?.map((image, index) => (
                         <div
@@ -176,11 +170,11 @@ const Product = ({ product }) => {
                     ))}
                 </div>
                 <div className="product-price-block flex items-center gap-2 flex-wrap mt-1 duration-300 relative z-[1]">
-                    <div className="product-price text-title">${product?.price}</div>
+                    <div className="product-price text-title">₹{product?.price}</div>
                     {product?.discount > 0 && (
                         <>
                             <div className="product-origin-price caption1 text-secondary2">
-                                <del>${product?.price + 10}</del>
+                                <del>₹{product?.price + 10}</del>
                             </div>
                             <div className="product-sale caption1 font-medium bg-green px-3 py-0.5 rounded-[5px] text-white">
                                 {product?.discount}% OFF

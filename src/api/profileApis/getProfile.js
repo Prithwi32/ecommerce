@@ -7,12 +7,13 @@ export async function getAccessToken() {
 
 import { getAccessToken } from "@/utils/getAccessToken";
 import { redirect } from 'next/navigation';
+import axios from 'axios';
 
 export async function getProfileData() {
     const accessToken = getAccessToken();
 
     if (!accessToken) {
-        redirect('/login'); // Redirect if no token
+        redirect('/login');
     }
 
     try {
@@ -31,4 +32,8 @@ export async function getProfileData() {
         console.error("Profile fetch failed:", error);
         return null;
     }
+}
+
+export async function sendOtp() {
+
 }

@@ -1,94 +1,101 @@
-import React from "react";
+"use client";
 import HandlePagination from "../Other/HandlePagination";
-import Link from "next/link";
-import * as Icon from "@phosphor-icons/react/dist/ssr";
 import Product from "../Product/Product";
+import { useState, useEffect } from "react";
+import { useProductStore } from "../Product/store/useProduct";
 
+export default function FilterSide({ sidebarData }) {
+    const [activeCategory, setActiveCategory] = useState(null);
+    const { products, lastEvaluatedKey, fetchProductsByCategory, fetchProducts , fetchMoreProducts  } = useProductStore();
 
-export default function FilterSide({ sidebarData, products }) {
+    useEffect(() => {
+      // Initial fetch when component mounts
+      if (!activeCategory) {
+        fetchProducts();
+      }
+    }, [fetchProducts, activeCategory]);
 
-  const renderProductTypes = () => {
-    const uniqueTypes = [...new Set(sidebarData.map((item) => item?.productType))];
-    return uniqueTypes.map((type, index) => (
-      <div key={index} className="item flex items-center justify-between cursor-pointer">
-        <div className="text-primary has-line-before capitalize">{type}</div>
-      </div>
-    ));
-  };
+    const handleCategoryClick = (cat) => {
+        setActiveCategory(cat.PK);
+        fetchProductsByCategory(cat.PK);
+    };
 
-  return (
-    <div>
-      <div className="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
-        <div className="container">
-          <div className="flex max-md:flex-wrap max-md:flex-col-reverse gap-y-8">
-            {/* Sidebar */}
-            <div className="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
-              {/* Products Type */}
-              <div className="filter-type pb-8 border-b border-line">
-                <div className="heading6">Products Type</div>
-                <div className="list-type mt-4">{renderProductTypes()}</div>
-              </div>
+    const handleLoadMore = () => {
+      if (activeCategory) {
+        fetchProductsByCategory(activeCategory, lastEvaluatedKey);
+      } else {
+        // If no category is active, load more for the default product list
+        // Assuming fetchProducts also handles pagination if needed, or add a separate fetchMoreProducts for the default list.
+        // For now, calling fetchProductsByCategory with null categoryId might not work as intended.
+        // We should have a dedicated fetchMoreProducts for the main product list.
+        // For this fix, we'll only enable 'Load More' for category filtered results.
+        fetchMoreProducts(lastEvaluatedKey); // Call fetchProducts with lastEvaluatedKey
+      }
+    };
 
-              {/* Size Filter */}
-              <div className="filter-size pb-8 border-b border-line mt-8">
-                <div className="heading6">Size</div>
-                <div className="list-size flex items-center flex-wrap gap-3 gap-y-4 mt-4">
-                  {["XS", "S", "M", "L", "XL", "2XL", "3XL"].map((item, index) => (
-                    <div
-                      key={index}
-                      className="size-item text-button w-[44px] h-[44px] flex items-center justify-center rounded-full border border-purple"
-                    >
-                      {item}
+    return (
+        <div className="shop-product breadcrumb1 lg:py-20 md:py-14 py-10">
+            <div className="container">
+                <div className="flex max-md:flex-wrap max-md:flex-col gap-y-8">
+                    {/* Sidebar */}
+                    <div className="sidebar lg:w-1/4 md:w-1/3 w-full md:pr-12">
+                        <div className="filter-type pb-8 border-b border-line">
+                            <div className="heading6">Categories</div>
+                            <div className="list-type mt-4">
+                                {/* All Products / Reset Filter */}
+                                <div
+                                    className={`item flex items-center justify-between cursor-pointer capitalize text-secondary ${!activeCategory ? 'text-indigo-600 font-semibold' : ''}`}
+                                    onClick={() => {
+                                        setActiveCategory(null);
+                                        fetchProducts(); // Fetch initial products
+                                    }}
+                                >
+                                    All Products
+                                </div>
+                                {sidebarData && sidebarData.length > 0 ? (
+                                    sidebarData.map((cat) => (
+                                        <div
+                                            key={cat.PK}
+                                            className={`item flex items-center justify-between cursor-pointer capitalize text-secondary ${activeCategory === cat.PK ? 'text-[#592dbb] font-semibold' : ''}`}
+                                            onClick={() => handleCategoryClick(cat)}
+                                        >
+                                            {cat.name}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-gray-400">No categories found</div>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                  ))}
-                  <div className="size-item text-button px-4 py-2 flex items-center justify-center rounded-full border border-purple">
-                    Freesize
-                  </div>
-                </div>
-              </div>
-
-              {/* Colors Filter */}
-              <div className="filter-color pb-8 border-b border-line mt-8">
-                <div className="heading6">Colors</div>
-                <div className="list-color flex items-center flex-wrap gap-3 gap-y-4 mt-4">
-                  {[
-                    { color: "#F4C5BF", name: "Pink" },
-                    { color: "red", name: "Red" },
-                    { color: "yellow", name: "Yellow" },
-                    { color: "green", name: "Green" },
-                  ].map((item, index) => (
-                    <div
-                      key={index}
-                      className="color-item px-3 py-[5px] flex items-center justify-center gap-2 rounded-full border border-line"
-                    >
-                      <div className={`color bg-[${item.color}] w-5 h-5 rounded-full`}></div>
-                      <div className="caption1 capitalize">{item.name}</div>
+                    {/* Product List */}
+                    <div className="list-product-block lg:w-3/4 md:w-2/3 w-full md:pl-3">
+                        <div className="list-product grid lg:grid-cols-3 sm:grid-cols-3 grid-cols-2 sm:gap-[30px] gap-[20px] mt-7">
+                            {products?.map((product) => (
+                                <Product key={product?.SK} product={product} />
+                            ))}
+                        </div>
+                        {/* {lastEvaluatedKey && (
+                          <div className="flex justify-center mt-8">
+                            <button
+                              className="button-main"
+                              onClick={handleLoadMore}
+                            >
+                              Load More
+                            </button>
+                          </div>
+                        )} */}
                     </div>
-                  ))}
+
+
                 </div>
-              </div>
+                <HandlePagination
+                  activeCategory={activeCategory}
+                  lastEvaluatedKey={lastEvaluatedKey}
+                  fetchMoreProducts={fetchMoreProducts}
+                  fetchProductsByCategory={fetchProductsByCategory}
+                />
             </div>
-
-            {/* Product List */}
-            <div className="list-product-block lg:w-3/4 md:w-2/3 w-full md:pl-3">
-              <div className={`list-product hide-product-sold grid lg:grid-cols-${3} sm:grid-cols-3 grid-cols-2 sm:gap-[30px] gap-[20px] mt-7`}>
-                {
-                  products?.map((product) => {
-                    return (
-                      <Product key={product?.SK} product={product} />
-                    )
-                  })
-                }
-              </div>
-
-
-              <div className="list-pagination flex items-center md:mt-10 mt-7">
-                {/* <HandlePagination pageCount={pageCount} onPageChange={handlePageChange} /> */}
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

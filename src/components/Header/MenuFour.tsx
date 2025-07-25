@@ -16,6 +16,7 @@ import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import useCartStore from "@/globalStore/useCartStore";
 import Cookies from "js-cookie";
+import { useWishlist } from "@/context/WishlistContext";
 
 interface Props {
   props: string;
@@ -34,6 +35,8 @@ const MenuFour: React.FC<Props> = ({ props }) => {
   const router = useRouter();
   const { mergedCart } = useCartStore();
   const [openDropdown, setOpenDropdown] = useState(false);
+  const { wishlistState } = useWishlist();
+
 
   const handleSearch = (value: string) => {
     router.push(`/search-result?query=${value}`);
@@ -72,7 +75,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
         Login
       </Link>
       <div className="text-secondary text-center mt-3 pb-4">
-        Don’t have an account?
+        Don't have an account?
         <Link
           href={"/register"}
           className="text-black pl-1 hover:underline hover:text-purple"
@@ -112,21 +115,20 @@ const MenuFour: React.FC<Props> = ({ props }) => {
               onClick={() => {
                 Cookies.remove('accessToken');
                 router.push('/login');
-                console.log("Logout clicked");
                 setPopupContent(
                   <>
                     <Link href={"/login"} className="button-main w-full text-center">
                       Login
                     </Link>
-                    <div className="text-secondary text-center mt-3 pb-4">
-                      Don’t have an account?
+                    {/* <div className="text-secondary text-center mt-3 pb-4">
+                      Don't have an account?
                       <Link
                         href={"/register"}
                         className="text-black pl-1 hover:underline hover:text-purple"
                       >
                         Register
                       </Link>
-                    </div>
+                    </div> */}
                     <div className="bottom pt-4 border-t border-line"></div>
                     <Link href={"#!"} className="body1 hover:underline">
                       Support
@@ -164,13 +166,16 @@ const MenuFour: React.FC<Props> = ({ props }) => {
             </div>
 
             <div className="form-search relative max-lg:hidden z-[1]">
-              <Image
-                src="/logo2.png" // Path relative to the public folder
-                alt="Company Logo"
-                width={150} // Specify width (optional for fixed sizes)
-                height={150} // Specify height (optional for fixed sizes)
-                className="h-full w-auto mr-3" // Additional styling if needed
-              />
+              <div className="w-[150px] h-[56px] flex items-center">
+                <Image
+                  src="/logo2.png"
+                  alt="Company Logo"
+                  width={150}
+                  height={56}
+                  className="w-auto h-full object-contain"
+                  priority
+                />
+              </div>
             </div>
             <div className="menu-main h-full xl:w-full flex items-center justify-center max-lg:hidden xl:absolute xl:top-1/2 xl:left-1/2 xl:-translate-x-1/2 xl:-translate-y-1/2">
               <ul className="flex items-center gap-8 h-full">
@@ -178,7 +183,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                   <Link
                     href="/"
                     className={` text-white text-button-uppercase duration-300 h-full flex items-center justify-center gap-1 
-                                            ${pathname.includes("/homepages")
+                        ${pathname.includes("/homepages")
                         ? "active"
                         : ""
                       }`}
@@ -187,7 +192,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                   </Link>
                 </li>
 
-                <li className="h-full">
+                <li className="h-full hidden ">
                   <Link
                     href="/shop"
                     className="text-white text-button-uppercase duration-300 h-full flex items-center justify-center"
@@ -218,9 +223,9 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                     href="#!"
                     className="text-white text-button-uppercase duration-300 h-full flex items-center justify-center"
                   >
-                    Pages
+                    Company Profile
                   </Link>
-                  <div className="sub-menu py-3 px-5 -left-10 absolute  rounded-b-xl backdrop-blur">
+                  <div className="sub-menu py-3 px-5  absolute  rounded-b-xl backdrop-blur">
                     <ul className="w-full">
                       <li>
                         <Link
@@ -240,7 +245,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                           Contact Us
                         </Link>
                       </li>
-                      <li>
+                      {/* <li>
                         <Link
                           href="/pages/client-contact"
                           className={`text-secondary duration-300 ${pathname === "/pages/client-contact" ? "active" : ""
@@ -248,7 +253,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                         >
                           Client Contact
                         </Link>
-                      </li>
+                      </li> */}
                       <li>
                         <Link
                           href="/pages/privacy-policy"
@@ -285,7 +290,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                           Coming Soon
                         </Link>
                       </li> */}
-                      <li>
+                      {/* <li>
                         <Link
                           href="/pages/customer-feedbacks"
                           className={`text-secondary duration-300 ${pathname === "/pages/customer-feedbacks"
@@ -295,7 +300,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                         >
                           Customer Feedbacks
                         </Link>
-                      </li>
+                      </li> */}
                     </ul>
                   </div>
                 </li>
@@ -314,7 +319,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                     className={`login-popup absolute top-[74px] w-[320px] p-7 rounded-xl bg-white box-shadow-sm 
                     ${openLoginPopup ? "open" : ""}`}
                   >
-                  {popupContent}
+                    {popupContent}
                   </div>
                 </div>
 
@@ -322,7 +327,10 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                   className="max-md:hidden wishlist-icon flex items-center cursor-pointer"
                   onClick={openModalWishlist}
                 >
-                  <Icon.Heart size={24} color="white" />
+                  {/* <Icon.Heart size={24} color="white" />
+                  <span className="quantity cart-quantity absolute -right-1.5 -top-1.5 text-xs text-black bg-white w-4 h-4 flex items-center justify-center rounded-full">
+                    {wishlistState?.wishlistArray?.length}
+                  </span> */}
                 </div>
                 <div
                   className="cart-icon flex items-center relative cursor-pointer"
@@ -391,7 +399,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                   >
                     <a
                       href={"/shop"}
-                      className="text-xl text-white font-semibold flex items-center justify-between mt-5"
+                      className="text-xl text-white hidden font-semibold flex items-center justify-between mt-5"
                     >
                       Shop
                       <span className="text-right">
@@ -438,7 +446,7 @@ const MenuFour: React.FC<Props> = ({ props }) => {
                       href={"#!"}
                       className="text-xl text-white font-semibold flex items-center justify-between mt-5"
                     >
-                      Pages
+                      Company Profile
                       <span
                         className={`${openMenuMobile ? "open" : ""
                           } tesxt-right`}
